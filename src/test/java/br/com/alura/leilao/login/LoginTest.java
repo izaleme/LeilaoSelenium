@@ -1,9 +1,10 @@
 package br.com.alura.leilao.login;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import br.com.alura.leilao.lance.LancesPage;
 
 /* Descrição dos testes de login:
  * Testes de Autenticação (autenticação de dados válidos ou inválidos) e
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class LoginTest {
 	
 	private LoginPage paginaDeLogin;
-	
+
 	@BeforeEach
 	public void beforeEach() {
 		this.paginaDeLogin = new LoginPage();
@@ -26,31 +27,33 @@ public class LoginTest {
 	@Test
 	// VERIFICA SE EFETUOU LOGIN CORRETAMENTE
 	public void deveriaEfetuarLoginComDadosValidos() {
-		paginaDeLogin.preencheFormularioDeLogin("fulano", "pass");
-		paginaDeLogin.efetuaLogin();
+		paginaDeLogin.efetuarLogin("fulano", "pass");
 
-		Assert.assertEquals("fulano", paginaDeLogin.getUsuarioLogado());
-		Assert.assertFalse(paginaDeLogin.isPaginaDeLogin());
+		String nomeUsuarioLogado = paginaDeLogin.getNomeUsuarioLogado();
+		Assertions.assertEquals("fulano", nomeUsuarioLogado);
+		Assertions.assertFalse(paginaDeLogin.isPaginaAtual());
 	}
+
 
 	@Test
 	// VERIFICA LOGIN INVÁLIDO
 	public void naoDeveriaEfetuarLoginComDadosInvalidos() {
-		paginaDeLogin.preencheFormularioDeLogin("invalido", "123");
-		paginaDeLogin.efetuaLogin();
-		
-		Assert.assertTrue(paginaDeLogin.isPaginaDeLoginComDadosInvalidos());
-		Assert.assertNull(paginaDeLogin.getUsuarioLogado());
-		Assert.assertTrue(paginaDeLogin.contemTexto("Usuário e senha inválidos."));
+		paginaDeLogin.efetuarLogin("invalido", "1233");
+
+		Assertions.assertNull(paginaDeLogin.getNomeUsuarioLogado());
+		Assertions.assertTrue(paginaDeLogin.isPaginaAtual());
+		Assertions.assertTrue(paginaDeLogin.isMensagemDeLoginInvalidoVisivel());
 	}
 
 	@Test
 	//VERIFICA SE NÃO ENTROU NA PAGINA RESTRITA DE QUANDO USER ESTA LOGADO
 	public void naoDeveriaAcessarUrlRestritaSemEstarLogado() {
-		paginaDeLogin.navegaParaPaginaDeLances();
+		LancesPage paginaDeLances = new LancesPage();
 
-		Assert.assertTrue(paginaDeLogin.isPaginaDeLogin());
-		Assert.assertFalse(paginaDeLogin.contemTexto("Dados do Leilão"));
+		Assertions.assertFalse(paginaDeLances.isPaginaAtual());
+		Assertions.assertFalse(paginaDeLances.isTituloLeilaoVisivel());
+
+		paginaDeLances.fechar();
 	}
 
 }
